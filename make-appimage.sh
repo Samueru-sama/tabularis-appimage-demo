@@ -3,16 +3,21 @@
 set -eu
 
 ARCH=$(uname -m)
-VERSION=$(pacman -Q PACKAGENAME | awk '{print $2; exit}') # example command to get version of application here
+VERSION=0.9.6 # example command to get version of application here
 export ARCH VERSION
 export OUTPATH=./dist
 export ADD_HOOKS="self-updater.bg.hook"
 export UPINFO="gh-releases-zsync|${GITHUB_REPOSITORY%/*}|${GITHUB_REPOSITORY#*/}|latest|*$ARCH.AppImage.zsync"
-export ICON=PATH_OR_URL_TO_ICON
-export DESKTOP=PATH_OR_URL_TO_DESKTOP_ENTRY
+
+wget https://github.com/debba/tabularis/releases/download/v${VERSION}/tabularis_${VERSION}_amd64.deb -O /tmp/tmp.deb
+ar xv /tmp/tmp.deb
+tar xfv ./data.tar.gz
+mv -v ./usr ./AppDir
+cp -v ./AppDir/share/applications/tabularis.desktop ./AppDir
+cp -v ./AppDir/share/icons/hicolor/512x512/apps/tabularis.png ./AppDir
 
 # Deploy dependencies
-quick-sharun /PATH/TO/BINARY_AND_LIBRARIES_HERE
+quick-sharun ./AppDir/bin/*
 
 # Additional changes can be done in between here
 
